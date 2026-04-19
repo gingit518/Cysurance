@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warranty Compliance Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+        
+        .subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .summary-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .summary-card.featured {
+            border: 2px solid #3b82f6;
+        }
+        
+        .summary-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .summary-value {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .summary-value.warning {
+            color: #f59e0b;
+        }
+        
+        .control-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .control-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .control-icon.pass {
+            background: var(--success-bg);
+            color: var(--success-color);
+        }
+        
+        .control-icon.fail {
+            background: var(--danger-bg);
+            color: var(--danger-color);
+        }
+        
+        :root {
+            --success-bg: rgba(34, 197, 94, 0.2);
+            --success-color: #16a34a;
+            --danger-bg: rgba(239, 68, 68, 0.2);
+            --danger-color: #dc2626;
+            --warning-bg: rgba(249, 115, 22, 0.2);
+            --warning-color: #d97706;
+            --info-bg: rgba(59, 130, 246, 0.2);
+            --info-color: #2563eb;
+        }
+        
+        .control-content {
+            flex: 1;
+        }
+        
+        .control-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+        
+        .control-score {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+        
+        .control-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        
+        .control-bar-fill {
+            height: 100%;
+            background: #22c55e;
+            border-radius: 2px;
+        }
+        
+        .control-bar-fill.warning {
+            background: #f59e0b;
+        }
+        
+        .control-note {
+            font-size: 10px;
+            color: #d97706;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .impact-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .impact-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        .impact-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .impact-description {
+            font-size: 10px;
+            color: #666;
+        }
+        
+        .roadmap-item {
+            padding: 16px;
+            background: white;
+            border-left: 3px solid #f59e0b;
+            border-radius: 4px;
+            margin-bottom: 12px;
+        }
+        
+        .roadmap-item.primary {
+            border-left-color: #f59e0b;
+        }
+        
+        .roadmap-item.final {
+            border-left-color: #3b82f6;
+        }
+        
+        .roadmap-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .roadmap-text {
+            font-size: 11px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Warranty Control Conditions Compliance</h1>
+        <p class="subtitle">Quarterly audit | March 15, 2026 | Overall: 62.5% (5/8 controls passing)</p>
+        
+        <div class="summary-grid">
+            <div class="summary-card featured">
+                <div class="summary-label">Controls Passing</div>
+                <div class="summary-value" style="color: #3b82f6;">5 of 8</div>
+            </div>
+            
+            <div class="summary-card">
+                <div class="summary-label">Compliance Rate</div>
+                <div class="summary-value warning">62.5%</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Warranty Control Assessment</h2>
+            
+            <div class="control-item">
+                <div class="control-icon pass">✓</div>
+                <div class="control-content">
+                    <div class="control-name">Next-Gen Antivirus / EDR</div>
+                    <div class="control-score">
+                        <span>Requirement: ≥70%</span>
+                        <span style="font-weight: 600; color: #1a1a1a;">72% ✓ Pass</span>
+                    </div>
+                    <div class="control-bar">
+                        <div class="control-bar-fill" style="width: 72%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-item">
+                <div class="control-icon fail">✕</div>
+                <div class="control-content">
+                    <div class="control-name">MDR / SIEM</div>
+                    <div class="control-score">
+                        <span>Requirement: ≥60%</span>
+                        <span style="font-weight: 600; color: #dc2626;">48% ✗ Fail</span>
+                    </div>
+                    <div class="control-bar">
+                        <div class="control-bar-fill warning" style="width: 48%;"></div>
+                    </div>
+                    <div class="control-note">Action: Upgrade to managed MDR by Q2 2026 (~$150K)</div>
+                </div>
+            </div>
+            
+            <div class="control-item">
+                <div class="control-icon pass">✓</div>
+                <div class="control-content">
+                    <div class="control-name">MFA (Multi-Factor Authentication)</div>
+                    <div class="control-score">
+                        <span>Requirement: ≥80%</span>
+                        <span style="font-weight: 600; color: #1a1a1a;">87% ✓ Pass</span>
+                    </div>
+                    <div class="control-bar">
+                        <div class="control-bar-fill" style="width: 87%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-item">
+                <div class="control-icon pass">✓</div>
+                <div class="control-content">
+                    <div class="control-name">Backups</div>
+                    <div class="control-score">
+                        <span>Requirement: ≥85%</span>
+                        <span style="font-weight: 600; color: #1a1a1a;">90% ✓ Pass</span>
+                    </div>
+                    <div class="control-bar">
+                        <div class="control-bar-fill" style="width: 90%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-item">
+                <div class="control-icon fail">✕</div>
+                <div class="control-content">
+                    <div class="control-name">Data Privacy Compliance / Encryption</div>
+                    <div class="control-score">
+                        <span>Requirement: ≥75%</span>
+                        <span style="font-weight: 600; color: #dc2626;">67% ✗ Fail</span>
+                    </div>
+                    <div class="control-bar">
+                        <div class="control-bar-fill warning" style="width: 67%;"></div>
+                    </div>
+                    <div class="control-note">Action: Privacy assessment + encryption upgrade (~$200K)</div>
+                </div>
+            </div>
+            
+            <div class="control-item">
+                <div class="control-icon fail">✕</div>
+                <div class="control-content">
+                    <div class="control-name">Patch Updates</div>
+                    <div class="control-score">
+                        <span>Requirement: ≥75%</span>
+                        <span style="font-weight: 600; color: #dc2626;">72% ✗ Fail</span>
+                    </div>
+                    <div class="control-bar">
+                        <div class="control-bar-fill warning" style="width: 72%;"></div>
+                    </div>
+                    <div class="control-note">Action: Automate patch management (~$50K)</div>
+                </div>
+            </div>
+            
+            <div class="control-item">
+                <div class="control-icon pass">✓</div>
+                <div class="control-content">
+                    <div class="control-name">Security Awareness Training</div>
+                    <div class="control-score">
+                        <span>Requirement: ≥80%</span>
+                        <span style="font-weight: 600; color: #1a1a1a;">96% ✓ Pass</span>
+                    </div>
+                    <div class="control-bar">
+                        <div class="control-bar-fill" style="width: 96%;"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="control-item">
+                <div class="control-icon pass">✓</div>
+                <div class="control-content">
+                    <div class="control-name">Invoice & Wire Change Procedures</div>
+                    <div class="control-score">
+                        <span>Requirement: ≥85%</span>
+                        <span style="font-weight: 600; color: #1a1a1a;">100% ✓ Pass</span>
+                    </div>
+                    <div class="control-bar">
+                        <div class="control-bar-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Warranty Compliance Impact on Risk Scores</h2>
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-label">Cyber Risk (Current)</div>
+                    <div class="impact-value" style="color: #dc2626;">65</div>
+                    <div class="impact-description">With 62.5% control compliance</div>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-label">Cyber Risk (Q2 2026)</div>
+                    <div class="impact-value" style="color: #f59e0b;">22</div>
+                    <div class="impact-description">When 7 of 8 controls pass</div>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-label">Cyber Risk (Target)</div>
+                    <div class="impact-value" style="color: #3b82f6;">8</div>
+                    <div class="impact-description">When 8 of 8 controls pass</div>
+                </div>
+                
+                <div class="impact-card">
+                    <div class="impact-label">Insurance Premium</div>
+                    <div class="impact-value">$38.5K</div>
+                    <div class="impact-description">Annual cyber insurance</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Remediation Roadmap</h2>
+            
+            <div class="roadmap-item primary">
+                <div class="roadmap-title">Q2 2026: MDR Upgrade</div>
+                <div class="roadmap-text">Implement managed SOC service | Cost: $150K | Timeline: 90 days</div>
+            </div>
+            
+            <div class="roadmap-item primary">
+                <div class="roadmap-title">Q2 2026: Privacy Compliance</div>
+                <div class="roadmap-text">Privacy assessment + encryption upgrade | Cost: $200K | Timeline: 120 days</div>
+            </div>
+            
+            <div class="roadmap-item primary">
+                <div class="roadmap-title">Q2 2026: Patch Automation</div>
+                <div class="roadmap-text">Automate patch management system | Cost: $50K | Timeline: 60 days</div>
+            </div>
+            
+            <div class="roadmap-item final">
+                <div class="roadmap-title">Investment Summary</div>
+                <div class="roadmap-text"><strong>Total: $400K over 4 months | Expected Q3 2026: Full warranty compliance (8 of 8 controls)</strong></div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #999; font-size: 12px;">
+            <p>Warranty Compliance Dashboard | Q2 2026</p>
+            <p style="margin-top: 8px;">Assessment of Cysurance warranty control requirements and remediation status</p>
+        </div>
+    </div>
+</body>
+</html>

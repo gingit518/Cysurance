@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control Mapping Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            margin-bottom: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        
+        thead {
+            background: #475569;
+            color: white;
+        }
+        
+        th {
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            border-right: 1px solid #e0e0e0;
+        }
+        
+        td {
+            padding: 12px;
+            border-right: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        tbody tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        tbody tr:hover {
+            background: #f0f0f0;
+        }
+        
+        .control-name {
+            font-weight: 600;
+            min-width: 160px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .badge-high {
+            background: rgba(34, 197, 94, 0.2);
+            color: #16a34a;
+        }
+        
+        .badge-medium {
+            background: rgba(107, 114, 128, 0.2);
+            color: #6b7280;
+        }
+        
+        .badge-na {
+            background: rgba(168, 162, 158, 0.2);
+            color: #a8a29e;
+        }
+        
+        .maturity-level {
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .score {
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+        }
+        
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .coverage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .coverage-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .coverage-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .coverage-number {
+            font-size: 24px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .coverage-text {
+            font-size: 10px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .coverage-bar {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .coverage-fill {
+            height: 100%;
+            background: #22c55e;
+            border-radius: 2px;
+        }
+        
+        @media (max-width: 768px) {
+            .table-wrapper {
+                font-size: 10px;
+            }
+            
+            th, td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Control Effectiveness Mapping by Risk Category</h1>
+        
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: rgba(34, 197, 94, 0.3);"></div>
+                <span>High effectiveness</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: rgba(107, 114, 128, 0.2);"></div>
+                <span>Medium effectiveness</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: rgba(168, 162, 158, 0.2);"></div>
+                <span>Not applicable</span>
+            </div>
+        </div>
+        
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Control</th>
+                        <th>Cyber</th>
+                        <th>Compliance</th>
+                        <th>Privacy</th>
+                        <th>Operational</th>
+                        <th>Maturity</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="control-name">Multi-Factor Auth</td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-na">—</span></td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-na">—</span></td>
+                        <td class="maturity-level">Level 3</td>
+                        <td class="score">72%</td>
+                    </tr>
+                    <tr>
+                        <td class="control-name">Encryption at Rest</td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-na">—</span></td>
+                        <td class="maturity-level">Level 3</td>
+                        <td class="score">85%</td>
+                    </tr>
+                    <tr>
+                        <td class="control-name">EDR (Endpoint Detection)</td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-na">—</span></td>
+                        <td class="maturity-level">Level 2</td>
+                        <td class="score">64%</td>
+                    </tr>
+                    <tr>
+                        <td class="control-name">Data Loss Prevention</td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-na">—</span></td>
+                        <td class="maturity-level">Level 1</td>
+                        <td class="score">48%</td>
+                    </tr>
+                    <tr>
+                        <td class="control-name">Backup & Disaster Recovery</td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td class="maturity-level">Level 3</td>
+                        <td class="score">82%</td>
+                    </tr>
+                    <tr>
+                        <td class="control-name">Audit Logging</td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td class="maturity-level">Level 3</td>
+                        <td class="score">78%</td>
+                    </tr>
+                    <tr>
+                        <td class="control-name">Policy Enforcement</td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-medium">Medium</span></td>
+                        <td class="maturity-level">Level 2</td>
+                        <td class="score">66%</td>
+                    </tr>
+                    <tr>
+                        <td class="control-name">Incident Response Plan</td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td style="text-align: center;"><span class="badge badge-high">High</span></td>
+                        <td class="maturity-level">Level 2</td>
+                        <td class="score">72%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Risk Coverage Analysis</h2>
+            <div class="coverage-grid">
+                <div class="coverage-card">
+                    <div class="coverage-label">Cyber Risk</div>
+                    <div class="coverage-number">6 of 8</div>
+                    <div class="coverage-text">Controls address</div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 75%;"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-card">
+                    <div class="coverage-label">Compliance Risk</div>
+                    <div class="coverage-number">7 of 8</div>
+                    <div class="coverage-text">Controls address</div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 88%;"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-card">
+                    <div class="coverage-label">Privacy Risk</div>
+                    <div class="coverage-number">8 of 8</div>
+                    <div class="coverage-text">Controls address</div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+                
+                <div class="coverage-card">
+                    <div class="coverage-label">Operational Risk</div>
+                    <div class="coverage-number">4 of 8</div>
+                    <div class="coverage-text">Controls address</div>
+                    <div class="coverage-bar">
+                        <div class="coverage-fill" style="width: 50%;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #999; font-size: 12px;">
+            <p>Control Effectiveness Mapping | Q2 2026</p>
+            <p style="margin-top: 8px;">Shows which controls address which risk categories and their maturity levels</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cysurance Risk Assessment Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+        
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value.danger {
+            color: #dc2626;
+        }
+        
+        .metric-value.warning {
+            color: #f59e0b;
+        }
+        
+        .metric-value.info {
+            color: #3b82f6;
+        }
+        
+        .metric-description {
+            font-size: 11px;
+            color: #666;
+            margin-top: 8px;
+        }
+        
+        .metric-trend {
+            font-size: 10px;
+            color: #666;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .progress-item {
+            margin-bottom: 20px;
+        }
+        
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 6px;
+        }
+        
+        .progress-label {
+            font-size: 12px;
+            color: #333;
+        }
+        
+        .progress-value {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: #22c55e;
+        }
+        
+        .progress-fill.warning {
+            background: #f59e0b;
+        }
+        
+        .finding-item {
+            padding: 15px;
+            background: white;
+            border-left: 3px solid #f59e0b;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+        
+        .finding-item.critical {
+            border-left-color: #dc2626;
+        }
+        
+        .finding-item.positive {
+            border-left-color: #3b82f6;
+        }
+        
+        .finding-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+        
+        .finding-text {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.5;
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cysurance Risk Assessment Dashboard</h1>
+        <p class="subtitle">Acme Corp | Q2 2026 | 250 employees | Financial Services | New York, NY</p>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Cyber Risk</div>
+                <div class="metric-value danger">62</div>
+                <div class="metric-description">High Risk</div>
+                <div class="metric-trend">↑ 8% from Q1</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Compliance</div>
+                <div class="metric-value warning">48</div>
+                <div class="metric-description">Medium Risk</div>
+                <div class="metric-trend">↓ 3% from Q1</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Data Privacy</div>
+                <div class="metric-value warning">55</div>
+                <div class="metric-description">High Risk</div>
+                <div class="metric-trend">↑ 2% from Q1</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Operational</div>
+                <div class="metric-value info">38</div>
+                <div class="metric-description">Medium Risk</div>
+                <div class="metric-trend">↓ 5% from Q1</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Financial Exposure</div>
+                <div class="metric-value danger" style="font-size: 24px;">$2.1M</div>
+                <div class="metric-description">Potential Loss</div>
+                <div class="metric-trend">Uninsured: $1.2M</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Control Effectiveness Summary</h2>
+            
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">Multi-Factor Authentication</span>
+                    <span class="progress-value">72%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 72%;"></div>
+                </div>
+                <div class="metric-description" style="margin-top: 4px;">1800 of 2500 users enrolled</div>
+            </div>
+            
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">Encryption at Rest</span>
+                    <span class="progress-value">85%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 85%;"></div>
+                </div>
+                <div class="metric-description" style="margin-top: 4px;">Data encrypted except legacy systems</div>
+            </div>
+            
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">Endpoint Detection & Response</span>
+                    <span class="progress-value">64%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill warning" style="width: 64%;"></div>
+                </div>
+                <div class="metric-description" style="margin-top: 4px;">1600 of 2500 endpoints protected</div>
+            </div>
+            
+            <div class="progress-item">
+                <div class="progress-header">
+                    <span class="progress-label">Data Loss Prevention</span>
+                    <span class="progress-value">48%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill warning" style="width: 48%;"></div>
+                </div>
+                <div class="metric-description" style="margin-top: 4px;">Email only, need endpoint DLP</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Key Findings & Recommendations</h2>
+            
+            <div class="finding-item critical">
+                <div class="finding-title">Critical: Cyber Risk Increasing</div>
+                <div class="finding-text">MFA enrollment declining. EDR gaps on 900 endpoints. Recommend immediate security awareness training.</div>
+            </div>
+            
+            <div class="finding-item critical">
+                <div class="finding-title">Warning: Privacy Risk</div>
+                <div class="finding-text">Data classification incomplete for 35% of databases. DLP not monitoring endpoints. Need data inventory refresh.</div>
+            </div>
+            
+            <div class="finding-item positive">
+                <div class="finding-title">Positive: Strong Backup Readiness</div>
+                <div class="finding-text">Recovery readiness at 82%. RTO targets met. Operational risk well-mitigated by backup program.</div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #999; font-size: 12px;">
+            <p>Cysurance Risk Model Dashboard | Generated Q2 2026</p>
+            <p style="margin-top: 8px;">Risk scores based on Cysurance external assessment + RiskQ control validation</p>
+        </div>
+    </div>
+</body>
+</html>

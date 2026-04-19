@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Exposure Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #f5f5f5;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: #1a1a1a;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 15px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-card {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .metric-label {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .metric-value {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .metric-description {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            box-sizing: border-box;
+            margin-bottom: 20px;
+        }
+        
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 12px;
+            font-size: 12px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .legend-color {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+        }
+        
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .scenario-card {
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        
+        .scenario-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 12px;
+        }
+        
+        .scenario-detail {
+            font-size: 11px;
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 8px;
+        }
+        
+        .scenario-divider {
+            border-top: 1px solid #e0e0e0;
+            padding-top: 12px;
+            margin-top: 12px;
+        }
+        
+        .scenario-value {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+        
+        .scenario-value-amount {
+            font-weight: 600;
+            color: #dc2626;
+        }
+        
+        .mitigation-item {
+            margin-bottom: 20px;
+        }
+        
+        .mitigation-label {
+            font-size: 12px;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .mitigation-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+        
+        .mitigation-fill {
+            height: 100%;
+            background: #22c55e;
+            border-radius: 4px;
+        }
+        
+        .mitigation-description {
+            font-size: 10px;
+            color: #666;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 20px;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Financial Exposure & Breach Cost Scenarios</h1>
+        
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Total Data At Risk</div>
+                <div class="metric-value">250K</div>
+                <div class="metric-description">Customer records, payment data, employee PII</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Avg Cost/Record</div>
+                <div class="metric-value">$8.50</div>
+                <div class="metric-description">Industry benchmark for financial services</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Base Loss If Breached</div>
+                <div class="metric-value" style="color: #dc2626;">$2.1M</div>
+                <div class="metric-description">Before multipliers & indirect costs</div>
+            </div>
+            
+            <div class="metric-card">
+                <div class="metric-label">Annual Loss Expectancy</div>
+                <div class="metric-value" style="color: #dc2626;">$105K</div>
+                <div class="metric-description">$2.1M × 5% probability/year</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Breach Cost Breakdown by Component</h2>
+            <div class="chart-container">
+                <canvas id="breachCostChart" role="img" aria-label="Pie chart of breach cost components">Notification 15%, Detection 8%, Containment 20%, Regulatory 12%, Business Loss 35%, Recovery 10%</canvas>
+            </div>
+            <div class="chart-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #3B82F6;"></div>
+                    <span>Detection 8%</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #06B6D4;"></div>
+                    <span>Containment 20%</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #8B5CF6;"></div>
+                    <span>Notification 15%</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #F97316;"></div>
+                    <span>Regulatory 12%</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #EF4444;"></div>
+                    <span>Business Loss 35%</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10B981;"></div>
+                    <span>Recovery 10%</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Financial Impact by Breach Size</h2>
+            <div class="chart-container">
+                <canvas id="breachSizeChart" role="img" aria-label="Bar chart of breach cost by number of records">100K records: $850K, 250K records: $2.1M, 500K records: $4.2M, 1M records: $8.5M</canvas>
+            </div>
+            <p style="font-size: 11px; color: #666; margin-top: 12px;">Chart shows escalating costs as breach size increases. Cost per record remains constant ($8.50), but business interruption and regulatory fines increase with breach magnitude.</p>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Breach Scenarios</h2>
+            <div class="scenario-grid">
+                <div class="scenario-card">
+                    <div class="scenario-title">Best-Case Scenario</div>
+                    <div class="scenario-detail">Small breach: 5,000 records</div>
+                    <div class="scenario-detail">Detection: 24 hours</div>
+                    <div class="scenario-detail">Containment: 48 hours</div>
+                    <div class="scenario-divider">
+                        <div class="scenario-value">
+                            <span>Estimated Cost:</span>
+                            <span class="scenario-value-amount">$425K</span>
+                        </div>
+                        <div class="scenario-value">
+                            <span style="font-size: 10px;">Insurance Covers:</span>
+                            <span style="font-weight: 600; color: #1a1a1a;">$100K deductible</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-title">Likely Scenario</div>
+                    <div class="scenario-detail">Medium breach: 50,000 records</div>
+                    <div class="scenario-detail">Detection: 3 days</div>
+                    <div class="scenario-detail">Containment: 5 days</div>
+                    <div class="scenario-divider">
+                        <div class="scenario-value">
+                            <span>Estimated Cost:</span>
+                            <span class="scenario-value-amount">$850K</span>
+                        </div>
+                        <div class="scenario-value">
+                            <span style="font-size: 10px;">Insurance Covers:</span>
+                            <span style="font-weight: 600; color: #1a1a1a;">$750K (covered)</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="scenario-card">
+                    <div class="scenario-title">Worst-Case Scenario</div>
+                    <div class="scenario-detail">Large breach: 250,000 records</div>
+                    <div class="scenario-detail">Detection: 2 weeks</div>
+                    <div class="scenario-detail">Containment: 3 weeks</div>
+                    <div class="scenario-divider">
+                        <div class="scenario-value">
+                            <span>Estimated Cost:</span>
+                            <span class="scenario-value-amount">$2.1M</span>
+                        </div>
+                        <div class="scenario-value">
+                            <span style="font-size: 10px;">Insurance Cap:</span>
+                            <span style="font-weight: 600; color: #1a1a1a;">$2M (gap: $100K)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <h2 class="section-title">Risk Mitigation Impact on Exposure</h2>
+            
+            <div class="mitigation-item">
+                <div class="mitigation-label">Baseline financial exposure</div>
+                <div class="mitigation-bar">
+                    <div class="mitigation-fill" style="width: 100%; background: #dc2626;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #666;">
+                    <span></span>
+                    <span style="font-weight: 600; color: #1a1a1a;">$2.1M</span>
+                </div>
+            </div>
+            
+            <div class="mitigation-item">
+                <div class="mitigation-label">After control improvements (72% mitigation)</div>
+                <div class="mitigation-bar">
+                    <div class="mitigation-fill" style="width: 28%; background: #f59e0b;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #666;">
+                    <span></span>
+                    <span style="font-weight: 600; color: #1a1a1a;">$583K</span>
+                </div>
+            </div>
+            
+            <div class="mitigation-item">
+                <div class="mitigation-label">With cyber insurance ($2M limit)</div>
+                <div class="mitigation-bar">
+                    <div class="mitigation-fill" style="width: 0%; background: #22c55e;"></div>
+                </div>
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #666;">
+                    <span></span>
+                    <span style="font-weight: 600; color: #1a1a1a;">$0 (covered)</span>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 15px; background: #f0f9ff; border-left: 3px solid #3b82f6; border-radius: 4px;">
+                <div style="font-size: 12px; font-weight: 600; color: #1a1a1a; margin-bottom: 8px;">Risk Reduction Achieved:</div>
+                <div style="font-size: 11px; color: #666; line-height: 1.6;">
+                    <div>Controls reduce potential loss by $1.52M (72%)</div>
+                    <div>Insurance transfers remaining $583K risk</div>
+                    <div style="margin-top: 8px; color: #1a1a1a; font-weight: 600;">Net organizational exposure: ~$0 (fully mitigated)</div>
+                </div>
+            </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #e0e0e0; color: #999; font-size: 12px;">
+            <p>Financial Exposure Dashboard | Q2 2026</p>
+            <p style="margin-top: 8px;">Breach cost analysis based on industry benchmarks and organizational risk profile</p>
+        </div>
+    </div>
+    
+    <script>
+        // Breach Cost Pie Chart
+        new Chart(document.getElementById('breachCostChart'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Detection', 'Containment', 'Notification', 'Regulatory', 'Business Loss', 'Recovery'],
+                datasets: [{
+                    data: [8, 20, 15, 12, 35, 10],
+                    backgroundColor: ['#3B82F6', '#06B6D4', '#8B5CF6', '#F97316', '#EF4444', '#10B981']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+        
+        // Breach Size Bar Chart
+        new Chart(document.getElementById('breachSizeChart'), {
+            type: 'bar',
+            data: {
+                labels: ['100K', '250K', '500K', '1M'],
+                datasets: [{
+                    label: 'Total Breach Cost',
+                    data: [850, 2100, 4200, 8500],
+                    backgroundColor: '#EF4444'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: {
+                        ticks: {
+                            callback: function(v) {
+                                return '$' + (v >= 1000 ? (v/1000).toFixed(1) + 'M' : v + 'K');
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
